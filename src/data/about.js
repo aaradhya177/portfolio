@@ -1,0 +1,21 @@
+export const aboutNote = {
+  title: 'README.txt',
+  modified: 'Last modified: 2024',
+  lines: [
+    "Hey, I'm Aaradhya.",
+    '',
+    'I build AI systems and full-stack products that',
+    'solve real problems \u2014 not just demo projects.',
+    '',
+    'Currently in my 3rd year at BIT Bengaluru,',
+    'shipping end-to-end systems, winning hackathons,',
+    'and actively looking for internships in',
+    'AI/ML engineering and software engineering.',
+    '',
+    'I think in systems.',
+    'I build end to end.',
+    "I don't stop at demos.",
+    '',
+    '\u2014 AM',
+  ],
+};
