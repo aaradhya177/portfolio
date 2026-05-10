@@ -511,7 +511,11 @@ select {
   left: 24px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  justify-content: flex-start;
+  gap: clamp(8px, 1.8vh, 20px);
+  max-height: calc(100vh - 48px - 32px);
+  padding-bottom: 80px;
+  overflow: visible;
   z-index: 2;
 }
 
@@ -1840,6 +1844,7 @@ select {
   right: 24px;
   bottom: 72px;
   width: 300px;
+  max-width: 300px;
   display: grid;
   gap: 0.9rem;
   padding: 20px;
@@ -1848,6 +1853,8 @@ select {
   background: rgba(19, 19, 26, 0.86);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(20px);
+  box-sizing: border-box;
+  overflow: hidden;
   z-index: 2;
 }
 
@@ -1871,11 +1878,13 @@ select {
 .desktop-player-volume-row {
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .desktop-player-topbar {
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 8px;
 }
 
 .desktop-player-note {
@@ -1886,6 +1895,10 @@ select {
 
 .desktop-player-label {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #64748b;
   font-size: 13px;
   letter-spacing: 0.12em;
@@ -1914,9 +1927,15 @@ select {
 }
 
 .desktop-player-track-copy {
+  width: 100%;
   min-width: 0;
   display: grid;
   gap: 0.3rem;
+}
+
+.desktop-player-track-row {
+  width: 100%;
+  min-width: 0;
 }
 
 .desktop-player-track-name-row {
@@ -1925,6 +1944,7 @@ select {
 
 .desktop-player-track-name,
 .desktop-player-mini-title {
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1940,6 +1960,10 @@ select {
 }
 
 .desktop-player-track-meta {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #64748b;
   font-size: 13px;
   line-height: 1.4;
@@ -1980,7 +2004,7 @@ select {
   height: 4px;
   border: none;
   padding: 0;
-  border-radius: 999px;
+  border-radius: 2px;
   background: #2a2a3a;
   cursor: pointer;
   overflow: hidden;
@@ -2005,6 +2029,8 @@ select {
   align-items: center;
   justify-content: center;
   gap: 32px;
+  width: 100%;
+  min-width: 0;
 }
 
 .desktop-player-control-button {
@@ -2021,7 +2047,7 @@ select {
 }
 
 .desktop-player-volume-row {
-  gap: 0.7rem;
+  gap: 8px;
 }
 
 .desktop-player-volume-icon {
@@ -2031,6 +2057,7 @@ select {
 
 .desktop-player-volume {
   flex: 1;
+  min-width: 0;
   height: 4px;
   margin: 0;
   appearance: none;
@@ -2367,7 +2394,9 @@ select {
   .desktop-icons {
     top: 18px;
     left: 14px;
-    gap: 20px;
+    gap: clamp(8px, 1.6vh, 16px);
+    max-height: calc(100vh - 48px - 18px);
+    padding-bottom: 80px;
   }
 
   .desktop-icon {
