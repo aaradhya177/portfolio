@@ -1,10 +1,20 @@
-import { memo } from 'react';
-import { achievements } from '../../data/achievements';
-import { profile } from '../../data/profile';
-import { projects } from '../../data/projects';
-import { downloadResume } from '../../utils/downloadResume';
+import { memo, useState } from 'react';
 
-export const ResumeApp = memo(function ResumeApp() {
+const RESUME_FILENAME = 'Aaradhya_Mehra_Resume.pdf';
+const RESUME_PATH = `/${RESUME_FILENAME}`;
+
+function downloadResume() {
+  const link = document.createElement('a');
+  link.href = RESUME_PATH;
+  link.download = RESUME_FILENAME;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function ResumeAppComponent() {
+  const [loadFailed, setLoadFailed] = useState(false);
+
   return (
     <div className="resume-app">
       <div className="resume-toolbar">
@@ -12,7 +22,7 @@ export const ResumeApp = memo(function ResumeApp() {
           <span className="resume-toolbar-icon" aria-hidden="true">
             {'\u{1F4C4}'}
           </span>
-          <span>Aaradhya_Mehra_Resume.pdf</span>
+          <span>{RESUME_FILENAME}</span>
         </div>
 
         <button type="button" className="resume-download-button" onClick={downloadResume}>
@@ -20,57 +30,30 @@ export const ResumeApp = memo(function ResumeApp() {
         </button>
       </div>
 
-      <div className="resume-document-scroll">
-        <div className="resume-document">
-          <header className="resume-header">
-            <h1 className="resume-name">{profile.name}</h1>
-            <div className="resume-contact-line">
-              <a href={`mailto:${profile.email}`}>{profile.email}</a>
-              <span>|</span>
-              <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">
-                LinkedIn
-              </a>
-              <span>|</span>
-              <a href={profile.codeforcesUrl} target="_blank" rel="noreferrer">
-                Codeforces
-              </a>
-              <span>|</span>
-              <a href={profile.githubUrl} target="_blank" rel="noreferrer">
-                GitHub
-              </a>
-            </div>
-          </header>
+      <div className="resume-viewer-shell">
+        {!loadFailed ? (
+          <iframe
+            src={RESUME_PATH}
+            width="100%"
+            height="100%"
+            style={{
+              border: 'none',
+              borderRadius: '0 0 10px 10px',
+            }}
+            title="Aaradhya Mehra Resume"
+            onError={() => setLoadFailed(true)}
+          />
+        ) : null}
 
-          <section className="resume-section">
-            <h2>Summary</h2>
-            <p>{profile.summary}</p>
-          </section>
-
-          <section className="resume-section">
-            <h2>Education</h2>
-            <p>BIT Bengaluru | B.Tech CSE | CGPA 8.5/10 | Sept 2023 – June 2027</p>
-          </section>
-
-          <section className="resume-section">
-            <h2>Skills</h2>
-            {Object.entries(profile.skills).map(([group, items]) => (
-              <p key={group}>
-                <strong>{group}:</strong> {items.join(', ')}
-              </p>
-            ))}
-          </section>
-
-          <section className="resume-section">
-            <h2>Projects</h2>
-            <p>{projects.map((projectItem) => projectItem.name).join(', ')}</p>
-          </section>
-
-          <section className="resume-section">
-            <h2>Achievements</h2>
-            <p>{achievements.map((achievement) => achievement.title).join(', ')}</p>
-          </section>
-        </div>
+        {loadFailed ? (
+          <div className="resume-fallback-message">
+            <p>📄 Resume not found.</p>
+            <p>Place Aaradhya_Mehra_Resume.pdf in the public/ folder.</p>
+          </div>
+        ) : null}
       </div>
     </div>
   );
-});
+}
+
+export const ResumeApp = memo(ResumeAppComponent);

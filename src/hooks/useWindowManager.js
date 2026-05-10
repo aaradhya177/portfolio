@@ -17,8 +17,8 @@ const WINDOW_DEFINITIONS = [
     id: 'resume',
     title: 'Resume',
     icon: '\u{1F4C4}',
-    defaultWidth: 680,
-    defaultHeight: 580,
+    defaultWidth: 780,
+    defaultHeight: 620,
   },
   {
     id: 'projects',
@@ -26,6 +26,13 @@ const WINDOW_DEFINITIONS = [
     icon: '\u{1F4C1}',
     defaultWidth: 860,
     defaultHeight: 520,
+  },
+  {
+    id: 'skills',
+    title: 'Skills',
+    icon: '\u{1F4CA}',
+    defaultWidth: 720,
+    defaultHeight: 500,
   },
   {
     id: 'about',
@@ -113,6 +120,7 @@ function createInitialWindows() {
       isOpen: false,
       isMinimized: false,
       isMaximized: false,
+      restoreFromTaskbar: false,
       transitionState: 'idle',
       restoreBounds: null,
       x: rect.x,
@@ -148,24 +156,19 @@ export function useWindowManager() {
   const openWindow = (id) => {
     setWindows((currentWindows) => {
       const frontZIndex = nextFrontZIndex(currentWindows);
-      const nextWindows = currentWindows.map((windowItem) =>
+
+      return currentWindows.map((windowItem) =>
         windowItem.id === id
           ? {
               ...windowItem,
               isOpen: true,
               isMinimized: false,
+              restoreFromTaskbar: windowItem.isMinimized,
               transitionState: 'idle',
               zIndex: frontZIndex,
             }
           : windowItem,
       );
-
-      console.log('[useWindowManager] openWindow', {
-        id,
-        nextWindows,
-      });
-
-      return nextWindows;
     });
   };
 
@@ -208,6 +211,7 @@ export function useWindowManager() {
             isOpen: false,
             isMinimized: false,
             isMaximized: false,
+            restoreFromTaskbar: false,
             transitionState: 'idle',
             restoreBounds: null,
           };
@@ -216,6 +220,7 @@ export function useWindowManager() {
         return {
           ...windowItem,
           isMinimized: true,
+          restoreFromTaskbar: false,
           transitionState: 'idle',
         };
       }),
@@ -243,6 +248,7 @@ export function useWindowManager() {
         windowItem.id === id && !windowItem.isMaximized
           ? {
               ...windowItem,
+              restoreFromTaskbar: false,
               ...nextRect,
             }
           : windowItem,

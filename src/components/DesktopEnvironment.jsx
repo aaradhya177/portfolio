@@ -1,12 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { profile } from '../data/profile';
+import { ContextMenu } from './ContextMenu';
 import { DesktopIcons } from './DesktopIcons';
+import { MusicPlayer } from './MusicPlayer';
 import { DesktopWallpaper } from './DesktopWallpaper';
 import { Taskbar } from './Taskbar';
 import { WindowLayer } from './WindowLayer';
 
 const TASKBAR_HEIGHT = 48;
 const SECURITY_TRIGGER = 'sudo rm -rf /';
+const CONTEXT_MENU_WIDTH = 220;
+const CONTEXT_MENU_HEIGHT = 184;
+
+function formatUptime(milliseconds) {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+
+  return `${hours}:${minutes}:${seconds}`;
+}
 
 export function DesktopEnvironment({
   activeWindowId,
@@ -29,8 +42,29 @@ export function DesktopEnvironment({
   });
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
   const [securityVisible, setSecurityVisible] = useState(false);
+  const [wallpaperStyle, setWallpaperStyle] = useState(0);
+  const [refreshCycle, setRefreshCycle] = useState(0);
+  const [aboutVisible, setAboutVisible] = useState(false);
+  const [contextMenuPosition, setContextMenuPosition] = useState(null);
+  const [uptime, setUptime] = useState(0);
   const desktopRef = useRef(null);
+  const taskbarButtonRegistryRef = useRef(new Map());
   const typedBufferRef = useRef('');
+  const pageLoadTimeRef = useRef(Date.now());
+
+  const registerTaskbarButton = (windowId, element) => {
+    if (!element) {
+      taskbarButtonRegistryRef.current.delete(windowId);
+      return;
+    }
+
+    taskbarButtonRegistryRef.current.set(windowId, element);
+  };
+
+  const getTaskbarButtonRect = (windowId) => {
+    const element = taskbarButtonRegistryRef.current.get(windowId);
+    return element?.getBoundingClientRect() ?? null;
+  };
 
   useEffect(() => {
     const element = desktopRef.current;
@@ -77,7 +111,7 @@ export function DesktopEnvironment({
     }
 
     syncWindowsToDesktop(desktopBounds);
-  }, [desktopBounds.height, desktopBounds.width]);
+  }, [desktopBounds.height, desktopBounds.width, syncWindowsToDesktop]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -105,16 +139,84 @@ export function DesktopEnvironment({
     };
   }, []);
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setUptime(Date.now() - pageLoadTimeRef.current);
+    }, 1000);
+
+    setUptime(Date.now() - pageLoadTimeRef.current);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!contextMenuPosition) {
+      return undefined;
+    }
+
+    const dismissMenu = () => {
+      setContextMenuPosition(null);
+    };
+
+    window.addEventListener('click', dismissMenu);
+    window.addEventListener('contextmenu', dismissMenu, true);
+
+    return () => {
+      window.removeEventListener('click', dismissMenu);
+      window.removeEventListener('contextmenu', dismissMenu, true);
+    };
+  }, [contextMenuPosition]);
+
   const handleDesktopClick = () => {
     setSelectedIconId(null);
+    setContextMenuPosition(null);
   };
 
-  console.log('[DesktopEnvironment] render windows', windows);
+  const handleDesktopContextMenu = (event) => {
+    if (
+      event.target.closest('.desktop-icons') ||
+      event.target.closest('.window-frame-shell') ||
+      event.target.closest('.taskbar') ||
+      event.target.closest('.context-menu') ||
+      event.target.closest('.os-modal')
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    setSelectedIconId(null);
+
+    const maxX = Math.max(window.innerWidth - CONTEXT_MENU_WIDTH - 12, 12);
+    const maxY = Math.max(window.innerHeight - CONTEXT_MENU_HEIGHT - 12, 12);
+
+    setContextMenuPosition({
+      x: Math.min(event.clientX, maxX),
+      y: Math.min(event.clientY, maxY),
+    });
+  };
+
+  const handleContextMenuAction = (actionId) => {
+    if (actionId === 'refresh') {
+      setRefreshCycle((currentCycle) => currentCycle + 1);
+    }
+
+    if (actionId === 'wallpaper') {
+      setWallpaperStyle((currentStyle) => (currentStyle + 1) % 3);
+    }
+
+    if (actionId === 'about') {
+      setAboutVisible(true);
+    }
+
+    setContextMenuPosition(null);
+  };
 
   if (isMobile) {
     return (
       <div ref={desktopRef} className="desktop-environment">
-        <DesktopWallpaper />
+        <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
         <div className="mobile-fallback">
           <div className="mobile-fallback-card">
             <div className="mobile-fallback-monogram">AM</div>
@@ -144,8 +246,11 @@ export function DesktopEnvironment({
       ref={desktopRef}
       className={`desktop-environment${securityVisible ? ' is-flickering' : ''}`}
       onClick={handleDesktopClick}
+      onContextMenu={handleDesktopContextMenu}
     >
-      <DesktopWallpaper />
+      <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
+
+      <MusicPlayer />
 
       <WindowLayer
         activeWindowId={activeWindowId}
@@ -153,6 +258,7 @@ export function DesktopEnvironment({
         desktopBounds={desktopBounds}
         finalizeWindowTransition={finalizeWindowTransition}
         focusWindow={focusWindow}
+        getTaskbarButtonRect={getTaskbarButtonRect}
         minimizeWindow={minimizeWindow}
         toggleMaximizeWindow={toggleMaximizeWindow}
         updateWindowRect={updateWindowRect}
@@ -163,6 +269,7 @@ export function DesktopEnvironment({
         desktopVisible={desktopVisible}
         onOpenIcon={openWindow}
         onSelectIcon={setSelectedIconId}
+        refreshCycle={refreshCycle}
         selectedIconId={selectedIconId}
       />
 
@@ -172,11 +279,39 @@ export function DesktopEnvironment({
         minimizeWindow={minimizeWindow}
         openWindow={openWindow}
         openWindows={openWindows}
+        registerTaskbarButton={registerTaskbarButton}
       />
 
       {securityVisible ? (
         <div className="security-overlay" role="alert">
-          Nice try. Permission denied. — AaradhyaOS Security
+          Nice try. Permission denied. - AaradhyaOS Security
+        </div>
+      ) : null}
+
+      {contextMenuPosition ? (
+        <ContextMenu onAction={handleContextMenuAction} position={contextMenuPosition} />
+      ) : null}
+
+      {aboutVisible ? (
+        <div className="os-modal-backdrop" onClick={() => setAboutVisible(false)}>
+          <div
+            className="os-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="aaradhyaos-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2 id="aaradhyaos-modal-title" className="os-modal-title">
+              AaradhyaOS v1.0
+            </h2>
+            <div className="os-modal-copy">Built by Aaradhya Mehra</div>
+            <div className="os-modal-copy">Kernel: Curiosity 9000X</div>
+            <div className="os-modal-copy">Uptime: {formatUptime(uptime)}</div>
+            <div className="os-modal-copy">Memory: 8192MB Ambition DDR5</div>
+            <button type="button" className="os-modal-button" onClick={() => setAboutVisible(false)}>
+              [OK]
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

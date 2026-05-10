@@ -113,7 +113,7 @@ export function useTerminal(containerRef, onDownloadResume) {
       convertEol: true,
       cursorBlink: true,
       fontFamily: '"JetBrains Mono", monospace',
-      fontSize: 13,
+      fontSize: 15,
       theme: {
         background: '#050508',
         foreground: '#00F5FF',

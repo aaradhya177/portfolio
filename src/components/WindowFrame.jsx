@@ -9,7 +9,18 @@ function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), maximum);
 }
 
-function getMotionTarget(transitionState, desktopBounds, x, y, width) {
+function getTaskbarOffset(taskbarButtonRect, x, y, width, height) {
+  if (!taskbarButtonRect) {
+    return null;
+  }
+
+  return {
+    x: taskbarButtonRect.left + taskbarButtonRect.width / 2 - (x + width / 2),
+    y: taskbarButtonRect.top + taskbarButtonRect.height / 2 - (y + height / 2),
+  };
+}
+
+function getMotionTarget(transitionState, desktopBounds, x, y, width, height, taskbarOffset) {
   if (transitionState === 'closing') {
     return {
       opacity: 0,
@@ -22,9 +33,9 @@ function getMotionTarget(transitionState, desktopBounds, x, y, width) {
   if (transitionState === 'minimizing') {
     return {
       opacity: 0,
-      scale: 0.72,
-      x: ((desktopBounds.width / 2) - (x + width / 2)) * 0.18,
-      y: Math.max(desktopBounds.height - y - 72, 48),
+      scale: 0.1,
+      x: taskbarOffset?.x ?? ((desktopBounds.width / 2) - (x + width / 2)) * 0.18,
+      y: taskbarOffset?.y ?? Math.max(desktopBounds.height - y - 72, 48),
     };
   }
 
@@ -49,8 +60,10 @@ export function WindowFrame({
   desktopBounds,
   finalizeWindowTransition,
   focusWindow,
+  getTaskbarButtonRect,
   isActive,
   isMaximized,
+  restoreFromTaskbar,
   transitionState,
   minimizeWindow,
   toggleMaximizeWindow,
@@ -61,6 +74,7 @@ export function WindowFrame({
   const resizeStateRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const taskbarButtonRect = getTaskbarButtonRect(id);
 
   const dragBounds = useMemo(
     () => ({
@@ -139,34 +153,42 @@ export function WindowFrame({
   };
 
   const motionTarget = useMemo(() => {
-    if (transitionState !== 'minimizing') {
-      return getMotionTarget(transitionState, desktopBounds, defaultX, defaultY, defaultWidth);
-    }
+    return getMotionTarget(
+      transitionState,
+      desktopBounds,
+      defaultX,
+      defaultY,
+      defaultWidth,
+      defaultHeight,
+      getTaskbarOffset(taskbarButtonRect, defaultX, defaultY, defaultWidth, defaultHeight),
+    );
+  }, [defaultHeight, defaultWidth, defaultX, defaultY, desktopBounds, taskbarButtonRect, transitionState]);
 
-    const taskbarButton = document.querySelector(
-      `[data-taskbar-window-id="${window.CSS?.escape ? window.CSS.escape(String(id)) : String(id)}"]`,
+  const initialMotion = useMemo(() => {
+    const taskbarOffset = getTaskbarOffset(
+      taskbarButtonRect,
+      defaultX,
+      defaultY,
+      defaultWidth,
+      defaultHeight,
     );
 
-    if (!taskbarButton || !nodeRef.current) {
-      return getMotionTarget(transitionState, desktopBounds, defaultX, defaultY, defaultWidth);
+    if (restoreFromTaskbar && taskbarOffset) {
+      return {
+        opacity: 0,
+        scale: 0.1,
+        x: taskbarOffset.x,
+        y: taskbarOffset.y,
+      };
     }
-
-    const buttonRect = taskbarButton.getBoundingClientRect();
-    const windowRect = nodeRef.current.getBoundingClientRect();
 
     return {
       opacity: 0,
-      scale: 0.72,
-      x:
-        buttonRect.left +
-        buttonRect.width / 2 -
-        (windowRect.left + windowRect.width / 2),
-      y:
-        buttonRect.top +
-        buttonRect.height / 2 -
-        (windowRect.top + windowRect.height / 2),
+      scale: 0.85,
+      x: 0,
+      y: 18,
     };
-  }, [defaultWidth, defaultX, defaultY, desktopBounds, id, transitionState]);
+  }, [defaultHeight, defaultWidth, defaultX, defaultY, restoreFromTaskbar, taskbarButtonRect]);
 
   return (
     <Draggable
@@ -213,12 +235,7 @@ export function WindowFrame({
           animate={motionTarget}
           className={`window-frame${isActive ? ' is-active' : ''}${isMaximized ? ' is-maximized' : ''}`}
           data-window-icon={icon}
-          initial={{
-            opacity: 0,
-            scale: 0.85,
-            x: 0,
-            y: 18,
-          }}
+          initial={initialMotion}
           layout
           onAnimationComplete={handleAnimationComplete}
           transition={{
@@ -229,8 +246,8 @@ export function WindowFrame({
                   damping: 25,
                 }
               : {
-                  duration: transitionState === 'closing' ? 0.15 : 0.25,
-                  ease: 'easeOut',
+                  duration: transitionState === 'closing' ? 0.15 : 0.3,
+                  ease: transitionState === 'minimizing' ? 'easeIn' : 'easeOut',
                 }),
           }}
         >

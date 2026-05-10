@@ -5,6 +5,7 @@ import { AchievementsApp } from './apps/AchievementsApp';
 import { ContactApp } from './apps/ContactApp';
 import { ProjectsApp } from './apps/ProjectsApp';
 import { ResumeApp } from './apps/ResumeApp';
+import { SkillsApp } from './apps/SkillsApp';
 import { TerminalApp } from './apps/TerminalApp';
 
 const WINDOW_CONTENT = {
@@ -24,6 +25,10 @@ function renderWindowContent(windowId) {
 
   if (windowId === 'resume') {
     return <ResumeApp />;
+  }
+
+  if (windowId === 'skills') {
+    return <SkillsApp />;
   }
 
   if (windowId === 'about') {
@@ -51,6 +56,7 @@ export function WindowLayer({
   desktopBounds,
   finalizeWindowTransition,
   focusWindow,
+  getTaskbarButtonRect,
   minimizeWindow,
   toggleMaximizeWindow,
   updateWindowRect,
@@ -60,10 +66,12 @@ export function WindowLayer({
     .filter((windowItem) => windowItem.isOpen && !windowItem.isMinimized)
     .sort((firstWindow, secondWindow) => firstWindow.zIndex - secondWindow.zIndex);
 
-  console.log('[WindowLayer] visibleWindows', visibleWindows);
-
   return (
-    <div className="window-layer" onClick={(event) => event.stopPropagation()}>
+    <div
+      className="window-layer"
+      onClick={(event) => event.stopPropagation()}
+      onContextMenu={(event) => event.stopPropagation()}
+    >
       <AnimatePresence>
         {visibleWindows.map((windowItem) => (
           <WindowFrame
@@ -76,10 +84,12 @@ export function WindowLayer({
             desktopBounds={desktopBounds}
             finalizeWindowTransition={finalizeWindowTransition}
             focusWindow={focusWindow}
+            getTaskbarButtonRect={getTaskbarButtonRect}
             icon={windowItem.icon}
             id={windowItem.id}
             isActive={activeWindowId === windowItem.id}
             isMaximized={windowItem.isMaximized}
+            restoreFromTaskbar={windowItem.restoreFromTaskbar}
             minimizeWindow={minimizeWindow}
             title={windowItem.title}
             toggleMaximizeWindow={toggleMaximizeWindow}

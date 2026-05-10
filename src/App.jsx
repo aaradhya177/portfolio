@@ -1,8 +1,11 @@
+import { AnimatePresence } from 'framer-motion';
 import { BiosScreen } from './components/BiosScreen';
 import { DesktopEnvironment } from './components/DesktopEnvironment';
 import { LoadingBar } from './components/LoadingBar';
 import { LoginScreen } from './components/LoginScreen';
+import { Screensaver } from './components/Screensaver';
 import { useBoot } from './hooks/useBoot';
+import { useScreensaver } from './hooks/useScreensaver';
 import { useWindowManager } from './hooks/useWindowManager';
 
 function App() {
@@ -30,6 +33,8 @@ function App() {
     toggleMaximizeWindow,
     syncWindowsToDesktop,
   } = useWindowManager();
+  const screensaverEnabled = stage === 'desktop' && desktopVisible && !loginActive;
+  const { isActive: screensaverActive } = useScreensaver(screensaverEnabled);
 
   return (
     <main className="app-shell">
@@ -45,7 +50,7 @@ function App() {
       {(stage === 'login' || stage === 'desktop') && (
         <>
           <div
-            className={`desktop-shell${desktopReady ? ' is-ready' : ''}${desktopVisible ? ' is-visible' : ''}`}
+            className={`desktop-shell${desktopReady ? ' is-ready' : ''}${desktopVisible ? ' is-visible' : ''}${screensaverActive ? ' is-dimmed' : ''}`}
             aria-hidden={!desktopVisible}
           >
             <DesktopEnvironment
@@ -70,6 +75,10 @@ function App() {
               onLogin={unlock}
             />
           )}
+
+          <AnimatePresence>
+            {screensaverActive ? <Screensaver isActive={screensaverActive} /> : null}
+          </AnimatePresence>
         </>
       )}
     </main>

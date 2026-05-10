@@ -30,7 +30,7 @@ const BIOS_STAGE_PAUSE = 1000;
 const LOADING_DURATION = 2500;
 const LOADING_MESSAGE_DELAY = 600;
 const PROGRESS_INTERVAL = 40;
-const DESKTOP_FADE_DURATION = 600;
+const DESKTOP_FADE_DURATION = 200;
 
 export function useBoot() {
   const [stage, setStage] = useState('bios');

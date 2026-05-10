@@ -51,7 +51,14 @@ function BatteryIcon() {
   );
 }
 
-export function Taskbar({ activeWindowId, focusWindow, minimizeWindow, openWindow, openWindows }) {
+export function Taskbar({
+  activeWindowId,
+  focusWindow,
+  minimizeWindow,
+  openWindow,
+  openWindows,
+  registerTaskbarButton,
+}) {
   const [clock, setClock] = useState(() => formatClock(new Date()));
 
   useEffect(() => {
@@ -79,7 +86,14 @@ export function Taskbar({ activeWindowId, focusWindow, minimizeWindow, openWindo
   };
 
   return (
-    <footer className="taskbar" onClick={(event) => event.stopPropagation()}>
+    <footer
+      className="taskbar"
+      onClick={(event) => event.stopPropagation()}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
       <div className="taskbar-section taskbar-left">
         <button type="button" className="taskbar-brand">
           AM
@@ -90,6 +104,7 @@ export function Taskbar({ activeWindowId, focusWindow, minimizeWindow, openWindo
         {openWindows.map((windowItem) => (
           <button
             key={windowItem.id}
+            ref={(element) => registerTaskbarButton(windowItem.id, element)}
             type="button"
             className={`taskbar-window-button${activeWindowId === windowItem.id && !windowItem.isMinimized ? ' is-active' : ''}`}
             data-taskbar-window-id={windowItem.id}
