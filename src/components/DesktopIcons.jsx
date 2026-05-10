@@ -22,6 +22,17 @@ export function DesktopIcons({
   return (
     <div
       className="desktop-icons"
+      style={{
+        position: 'absolute',
+        top: '24px',
+        left: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px',
+        maxHeight: 'calc(100vh - 48px - 48px)',
+        overflow: 'hidden',
+        zIndex: 10,
+      }}
       onClick={(event) => event.stopPropagation()}
       onContextMenu={(event) => {
         event.preventDefault();

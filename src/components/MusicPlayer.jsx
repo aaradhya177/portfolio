@@ -38,6 +38,35 @@ export function MusicPlayer() {
   } = useMusicPlayer();
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const cardStyle = {
+    width: '300px',
+    minWidth: '300px',
+    maxWidth: '300px',
+    padding: '20px',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+    background: '#13131a',
+    border: '1px solid #2a2a3a',
+    borderRadius: '16px',
+    position: 'fixed',
+    bottom: '72px',
+    right: '24px',
+    zIndex: 999,
+  };
+  const rowStyle = {
+    display: 'flex',
+    width: '100%',
+    boxSizing: 'border-box',
+    minWidth: 0,
+    overflow: 'hidden',
+  };
+  const textClampStyle = {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+    maxWidth: '100%',
+  };
 
   const handleSeek = (event) => {
     if (duration <= 0) {
@@ -91,6 +120,7 @@ export function MusicPlayer() {
   return (
     <motion.div
       className="desktop-player"
+      style={cardStyle}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: [0, -8, 0] }}
       transition={{
@@ -99,11 +129,13 @@ export function MusicPlayer() {
       }}
       onClick={(event) => event.stopPropagation()}
     >
-      <div className="desktop-player-topbar">
+      <div className="desktop-player-topbar" style={rowStyle}>
         <span className="desktop-player-note" aria-hidden="true">
           🎵
         </span>
-        <span className="desktop-player-label">AaradhyaOS Radio</span>
+        <span className="desktop-player-label" style={textClampStyle}>
+          AaradhyaOS Radio
+        </span>
         <button
           type="button"
           className="desktop-player-icon-button"
@@ -114,33 +146,36 @@ export function MusicPlayer() {
         </button>
       </div>
 
-      <div className="desktop-player-track-row">
-        <div className="desktop-player-track-copy">
-          <div className="desktop-player-track-name-row">
-            <h3 className="desktop-player-track-name" title={currentTrack.name}>
+      <div className="desktop-player-track-row" style={rowStyle}>
+        <div className="desktop-player-track-copy" style={{ ...textClampStyle, display: 'grid', gap: '0.3rem' }}>
+          <div className="desktop-player-track-name-row" style={rowStyle}>
+            <h3 className="desktop-player-track-name" title={currentTrack.name} style={textClampStyle}>
               {currentTrack.name}
             </h3>
             <Equalizer isPlaying={isPlaying} />
           </div>
-          <div className="desktop-player-track-meta">{currentTrack.artist}</div>
+          <div className="desktop-player-track-meta" style={textClampStyle}>
+            {currentTrack.artist}
+          </div>
         </div>
       </div>
 
       <button
         type="button"
         className="desktop-player-progress"
+        style={{ width: '100%', overflow: 'hidden', borderRadius: '2px' }}
         onClick={handleSeek}
         aria-label="Seek track"
       >
         <span className="desktop-player-progress-fill" style={{ width: `${progress}%` }} />
       </button>
 
-      <div className="desktop-player-time-row">
-        <span>{formatTime(currentTime)}</span>
-        <span>{duration > 0 ? formatTime(duration) : 'LIVE'}</span>
+      <div className="desktop-player-time-row" style={rowStyle}>
+        <span style={textClampStyle}>{formatTime(currentTime)}</span>
+        <span style={textClampStyle}>{duration > 0 ? formatTime(duration) : 'LIVE'}</span>
       </div>
 
-      <div className="desktop-player-controls">
+      <div className="desktop-player-controls" style={rowStyle}>
         <button type="button" className="desktop-player-control-button" onClick={prevTrack} aria-label="Previous track">
           ⏮
         </button>
@@ -157,7 +192,7 @@ export function MusicPlayer() {
         </button>
       </div>
 
-      <div className="desktop-player-volume-row">
+      <div className="desktop-player-volume-row" style={rowStyle}>
         <span className="desktop-player-volume-icon" aria-hidden="true">
           🔈
         </span>
@@ -168,6 +203,7 @@ export function MusicPlayer() {
           max="1"
           step="0.01"
           value={volume}
+          style={{ flex: 1, minWidth: 0, width: '100%' }}
           onChange={(event) => setVolume(Number(event.target.value))}
           aria-label="Volume"
         />
