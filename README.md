@@ -9,7 +9,7 @@
 
 ## 🖥️ Live Demo
 
-**[aaradhya.dev](https://aaradhya.dev)** ← replace with your actual deployed URL
+**[aaradhya.dev](https://portfolio-coral-tau-ovbo27wuwd.vercel.app/)** ← replace with your actual deployed URL
 
 ---
 
