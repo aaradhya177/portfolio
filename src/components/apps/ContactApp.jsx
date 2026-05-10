@@ -1,24 +1,76 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { profile } from '../../data/profile';
 
 const QUICK_LINKS = [
-  { id: 'email', icon: '\u2709', label: 'Email', href: `mailto:${profile.email}` },
-  { id: 'linkedin', icon: '\u{1F4BC}', label: 'LinkedIn', href: profile.linkedinUrl },
-  { id: 'github', icon: '\u{1F419}', label: 'GitHub', href: profile.githubUrl },
-  { id: 'codeforces', icon: '\u{265F}', label: 'Codeforces', href: profile.codeforcesUrl },
+  {
+    id: 'email',
+    icon: '✉',
+    label: 'Email',
+    onClick: () => window.open('mailto:aaradhyamehra240@gmail.com', '_blank'),
+  },
+  {
+    id: 'linkedin',
+    icon: '💼',
+    label: 'LinkedIn',
+    onClick: () => window.open('https://www.linkedin.com/in/aaradhyamehra-builds/', '_blank'),
+  },
+  {
+    id: 'github',
+    icon: '🐙',
+    label: 'GitHub',
+    onClick: () => window.open('https://github.com/aaradhya177', '_blank'),
+  },
+  {
+    id: 'twitter',
+    icon: '𝕏',
+    label: 'Twitter/X',
+    onClick: () => window.open('https://x.com/4aradhya_17', '_blank'),
+  },
+  {
+    id: 'codeforces',
+    icon: '♟',
+    label: 'Codeforces',
+    onClick: () => window.open('https://codeforces.com/profile/YoullNeverCodeAlone17', '_blank'),
+  },
 ];
 
 export const ContactApp = memo(function ContactApp() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [sent, setSent] = useState(false);
+  const [showValidationHint, setShowValidationHint] = useState(false);
+  const sentTimeoutRef = useRef(0);
+  const validationTimeoutRef = useRef(0);
 
-  const mailtoHref = useMemo(() => {
-    const params = new URLSearchParams({
-      subject,
-      body: message,
-    });
-    return `mailto:${profile.email}?${params.toString()}`;
-  }, [message, subject]);
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(sentTimeoutRef.current);
+      window.clearTimeout(validationTimeoutRef.current);
+    };
+  }, []);
+
+  const handleSend = () => {
+    if (!subject.trim() && !message.trim()) {
+      setShowValidationHint(true);
+      window.clearTimeout(validationTimeoutRef.current);
+      validationTimeoutRef.current = window.setTimeout(() => {
+        setShowValidationHint(false);
+      }, 2000);
+      return;
+    }
+
+    const mailtoLink = `mailto:aaradhyamehra240@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    window.open(mailtoLink, '_blank');
+    setSent(true);
+    setShowValidationHint(false);
+
+    window.clearTimeout(sentTimeoutRef.current);
+    sentTimeoutRef.current = window.setTimeout(() => {
+      setSent(false);
+      setSubject('');
+      setMessage('');
+    }, 3000);
+  };
 
   return (
     <div className="contact-app">
@@ -27,18 +79,17 @@ export const ContactApp = memo(function ContactApp() {
 
         <div className="contact-links-list">
           {QUICK_LINKS.map((linkItem) => (
-            <a
+            <button
               key={linkItem.id}
+              type="button"
               className="contact-link-item"
-              href={linkItem.href}
-              target={linkItem.href.startsWith('mailto:') ? undefined : '_blank'}
-              rel={linkItem.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+              onClick={linkItem.onClick}
             >
               <span className="contact-link-icon" aria-hidden="true">
                 {linkItem.icon}
               </span>
               <span>{linkItem.label}</span>
-            </a>
+            </button>
           ))}
         </div>
       </aside>
@@ -80,13 +131,16 @@ export const ContactApp = memo(function ContactApp() {
 
         <button
           type="button"
-          className="contact-send-button"
-          onClick={() => {
-            window.location.href = mailtoHref;
-          }}
+          className={`contact-send-button${sent ? ' is-sent' : ''}`}
+          onClick={handleSend}
+          disabled={sent}
         >
-          Send
+          {sent ? '✓ Message Opened in Mail' : 'Send'}
         </button>
+
+        {showValidationHint ? (
+          <div className="contact-validation-hint">Please enter a subject or message</div>
+        ) : null}
       </section>
     </div>
   );

@@ -1178,13 +1178,17 @@ button:hover .btn-icon {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  width: 100%;
+  border: none;
   border-radius: 0.9rem;
   padding: 0.82rem 0.9rem;
+  background: transparent;
   color: #dde6f4;
-  text-decoration: none;
+  text-align: left;
   transition:
     background-color 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    transform 120ms ease;
   font-size: 14px;
   line-height: 1.4;
 }
@@ -1194,6 +1198,10 @@ button:hover .btn-icon {
   background: #1a1a24;
   color: #00f5ff;
   outline: none;
+}
+
+.contact-link-item:active {
+  transform: scale(0.97);
 }
 
 .contact-link-icon {
@@ -1286,6 +1294,22 @@ button:hover .btn-icon {
   filter: brightness(1.1);
   transform: scale(1.01);
   outline: none;
+}
+
+.contact-send-button.is-sent {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.contact-send-button:disabled {
+  cursor: default;
+}
+
+.contact-validation-hint {
+  color: #ef4444;
+  font-size: 11px;
+  line-height: 1.4;
+  animation: contactHintFade 180ms ease-out;
 }
 
 .projects-app {
@@ -2404,6 +2428,18 @@ button:hover .btn-icon {
   from {
     opacity: 0;
     transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes contactHintFade {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
   }
 
   to {
