@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 const TASKBAR_HEIGHT = 48;
+const ICON_COLUMN_WIDTH = 80;
 const MIN_WINDOW_WIDTH = 400;
 const MIN_WINDOW_HEIGHT = 300;
 const DEFAULT_WINDOW_WIDTH = 720;
@@ -123,6 +124,10 @@ function createInitialWindows() {
       restoreFromTaskbar: false,
       transitionState: 'idle',
       restoreBounds: null,
+      prevX: null,
+      prevY: null,
+      prevWidth: null,
+      prevHeight: null,
       x: rect.x,
       y: rect.y,
       width: rect.width,
@@ -147,6 +152,24 @@ function constrainRect(rect, desktopBounds) {
     y: clamp(rect.y, 0, Math.max(desktopBounds.height - height, 0)),
     width,
     height,
+  };
+}
+
+function getMaximizedRect() {
+  if (typeof window === 'undefined') {
+    return {
+      x: ICON_COLUMN_WIDTH,
+      y: 0,
+      width: DEFAULT_WINDOW_WIDTH,
+      height: DEFAULT_WINDOW_HEIGHT,
+    };
+  }
+
+  return {
+    x: ICON_COLUMN_WIDTH,
+    y: 0,
+    width: Math.max(window.innerWidth - ICON_COLUMN_WIDTH, MIN_WINDOW_WIDTH),
+    height: Math.max(window.innerHeight - TASKBAR_HEIGHT, MIN_WINDOW_HEIGHT),
   };
 }
 
@@ -214,6 +237,10 @@ export function useWindowManager() {
             restoreFromTaskbar: false,
             transitionState: 'idle',
             restoreBounds: null,
+            prevX: null,
+            prevY: null,
+            prevWidth: null,
+            prevHeight: null,
           };
         }
 
@@ -263,21 +290,36 @@ export function useWindowManager() {
           return windowItem;
         }
 
-        if (windowItem.isMaximized && windowItem.restoreBounds) {
+        if (
+          windowItem.isMaximized &&
+          windowItem.prevX !== null &&
+          windowItem.prevY !== null &&
+          windowItem.prevWidth !== null &&
+          windowItem.prevHeight !== null
+        ) {
           return {
             ...windowItem,
-            ...windowItem.restoreBounds,
+            x: windowItem.prevX,
+            y: windowItem.prevY,
+            width: windowItem.prevWidth,
+            height: windowItem.prevHeight,
             isMaximized: false,
             restoreBounds: null,
+            prevX: null,
+            prevY: null,
+            prevWidth: null,
+            prevHeight: null,
           };
         }
 
+        const maximizedRect = getMaximizedRect();
+
         return {
           ...windowItem,
-          x: 0,
-          y: 0,
-          width: desktopBounds.width,
-          height: desktopBounds.height,
+          x: maximizedRect.x,
+          y: maximizedRect.y,
+          width: maximizedRect.width,
+          height: maximizedRect.height,
           isMaximized: true,
           restoreBounds: {
             x: windowItem.x,
@@ -285,6 +327,10 @@ export function useWindowManager() {
             width: windowItem.width,
             height: windowItem.height,
           },
+          prevX: windowItem.x,
+          prevY: windowItem.y,
+          prevWidth: windowItem.width,
+          prevHeight: windowItem.height,
         };
       }),
     );
@@ -294,12 +340,13 @@ export function useWindowManager() {
     setWindows((currentWindows) =>
       currentWindows.map((windowItem) => {
         if (windowItem.isMaximized) {
+          const maximizedRect = getMaximizedRect();
           return {
             ...windowItem,
-            x: 0,
-            y: 0,
-            width: desktopBounds.width,
-            height: desktopBounds.height,
+            x: maximizedRect.x,
+            y: maximizedRect.y,
+            width: maximizedRect.width,
+            height: maximizedRect.height,
           };
         }
 

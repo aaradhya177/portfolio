@@ -1,5 +1,6 @@
 import { AnimatePresence } from 'framer-motion';
 import { BiosScreen } from './components/BiosScreen';
+import { Cursor } from './components/Cursor';
 import { DesktopEnvironment } from './components/DesktopEnvironment';
 import { LoadingBar } from './components/LoadingBar';
 import { LoginScreen } from './components/LoginScreen';
@@ -81,6 +82,8 @@ function App() {
           </AnimatePresence>
         </>
       )}
+
+      <Cursor />
     </main>
   );
 }

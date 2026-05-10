@@ -22,7 +22,7 @@ export const ContactApp = memo(function ContactApp() {
 
   return (
     <div className="contact-app">
-      <aside className="contact-sidebar">
+      <aside className="contact-sidebar app-scroll">
         <div className="contact-sidebar-heading">Quick Links</div>
 
         <div className="contact-links-list">
@@ -43,7 +43,13 @@ export const ContactApp = memo(function ContactApp() {
         </div>
       </aside>
 
-      <section className="contact-compose-panel">
+      <section
+        className="contact-compose-panel app-scroll"
+        style={{
+          overflowY: 'auto',
+          height: '100%',
+        }}
+      >
         <h2 className="contact-compose-title">New Message</h2>
         <div className="contact-divider" />
 

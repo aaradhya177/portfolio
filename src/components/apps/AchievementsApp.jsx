@@ -9,7 +9,15 @@ export const AchievementsApp = memo(function AchievementsApp() {
         <h2 className="achievements-title">Achievements</h2>
       </header>
 
-      <div className="achievements-list">
+      <div
+        className="achievements-list app-scroll"
+        style={{
+          overflowY: 'auto',
+          height: '100%',
+          padding: '20px',
+          boxSizing: 'border-box',
+        }}
+      >
         {achievements.map((achievement, index) => (
           <motion.article
             key={achievement.id}

@@ -31,7 +31,7 @@ export function DesktopIcons({
         gap: '8px',
         maxHeight: 'calc(100vh - 48px - 48px)',
         overflow: 'hidden',
-        zIndex: 10,
+        zIndex: 100,
       }}
       onClick={(event) => event.stopPropagation()}
       onContextMenu={(event) => {

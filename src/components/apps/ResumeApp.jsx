@@ -30,7 +30,13 @@ function ResumeAppComponent() {
         </button>
       </div>
 
-      <div className="resume-viewer-shell">
+      <div
+        className="resume-viewer-shell app-scroll"
+        style={{
+          overflowY: 'auto',
+          height: 'calc(100% - 36px)',
+        }}
+      >
         {!loadFailed ? (
           <iframe
             src={RESUME_PATH}

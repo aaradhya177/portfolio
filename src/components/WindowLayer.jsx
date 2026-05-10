@@ -72,7 +72,7 @@ export function WindowLayer({
       onClick={(event) => event.stopPropagation()}
       onContextMenu={(event) => event.stopPropagation()}
     >
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {visibleWindows.map((windowItem) => (
           <WindowFrame
             key={windowItem.id}

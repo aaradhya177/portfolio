@@ -12,6 +12,7 @@
 
 * {
   box-sizing: border-box;
+  cursor: none !important;
 }
 
 html,
@@ -39,6 +40,119 @@ select {
   width: 100%;
   min-height: 100vh;
   isolation: isolate;
+}
+
+.cursor-system,
+.cursor-dot,
+.cursor-ring,
+.cursor-trail-dot {
+  position: fixed;
+  pointer-events: none;
+}
+
+.cursor-system {
+  inset: 0;
+  z-index: 99999;
+}
+
+.cursor-dot,
+.cursor-ring,
+.cursor-trail-dot {
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #00f5ff;
+  color: #00f5ff;
+  box-shadow:
+    0 0 8px rgba(0, 245, 255, 0.8),
+    0 0 16px rgba(0, 245, 255, 0.4);
+  transition:
+    width 200ms ease,
+    height 200ms ease,
+    opacity 200ms ease,
+    border-radius 200ms ease,
+    transform 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.cursor-dot.is-hover {
+  width: 4px;
+  height: 4px;
+  opacity: 0.5;
+}
+
+.cursor-dot.is-click {
+  width: 12px;
+  height: 12px;
+}
+
+.cursor-dot.is-text {
+  width: 2px;
+  height: 18px;
+  border-radius: 999px;
+}
+
+.cursor-dot.is-drag {
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 50%;
+  opacity: 0.95;
+}
+
+.cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid rgba(0, 245, 255, 0.5);
+  border-radius: 50%;
+  background: transparent;
+  z-index: 99998;
+  transition:
+    width 200ms ease,
+    height 200ms ease,
+    opacity 200ms ease,
+    transform 200ms ease,
+    border-color 200ms ease,
+    background-color 200ms ease,
+    border-style 200ms ease;
+}
+
+.cursor-ring.is-hover {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(0, 245, 255, 1);
+  background: rgba(0, 245, 255, 0.05);
+}
+
+.cursor-ring.is-click {
+  width: 24px;
+  height: 24px;
+}
+
+.cursor-ring.is-text {
+  opacity: 0.2;
+}
+
+.cursor-ring.is-drag {
+  border-style: dashed;
+}
+
+.cursor-trail-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00f5ff;
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
+  z-index: 99997;
+  transition: opacity 300ms ease;
 }
 
 .bios-screen,
@@ -670,7 +784,7 @@ select {
 
 .window-frame {
   display: grid;
-  grid-template-rows: 36px 1fr;
+  grid-template-rows: 40px 1fr;
   width: 100%;
   height: 100%;
   background: #13131a;
@@ -687,20 +801,18 @@ select {
 
 .window-frame-titlebar {
   position: relative;
-  display: grid;
-  grid-template-columns: 72px 1fr 72px;
+  display: flex;
   align-items: center;
-  height: 36px;
+  min-height: 40px;
   padding: 0 12px;
   background: #1a1a24;
   border-bottom: 1px solid #2a2a3a;
   border-radius: 10px 10px 0 0;
-  cursor: grab;
   opacity: 0.6;
   transition: opacity 160ms ease;
 }
 
-.window-frame-titlebar:active {
+.window-frame-titlebar.is-dragging {
   cursor: grabbing;
 }
 
@@ -717,8 +829,8 @@ select {
 }
 
 .window-frame-control {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border: none;
   border-radius: 999px;
   padding: 0;
@@ -753,27 +865,87 @@ select {
   background: #28ca41;
 }
 
-.window-frame-title {
+.title-bar:hover .btn-icon {
+  opacity: 1 !important;
+}
+
+button:hover .btn-icon {
+  opacity: 1 !important;
+}
+
+.traffic-btn {
+  position: relative;
+}
+
+.traffic-btn::before {
+  content: '';
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: calc(100% - 180px);
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+}
+
+.traffic-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.1);
+  transition: transform 100ms ease, filter 100ms ease;
+}
+
+.traffic-btn:active {
+  transform: scale(0.92);
+  transition: transform 80ms ease;
+}
+
+.window-frame-title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
   overflow: hidden;
   color: #e2e8f0;
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: grab;
+  line-height: 1.4;
+}
+
+.window-frame-title:active {
+  cursor: grabbing;
 }
 
 .window-frame-titlebar-spacer {
-  width: 72px;
-  justify-self: end;
+  width: 80px;
+  flex-shrink: 0;
 }
 
 .window-frame-content {
   height: 100%;
   background: #0d0d14;
   overflow: hidden;
+}
+
+.window-frame-content-inner {
+  width: 100%;
+  height: 100%;
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: #0d0d14;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
+}
+
+.app-scroll::-webkit-scrollbar-thumb:hover {
+  background: #00f5ff40;
 }
 
 .security-overlay,
@@ -1539,9 +1711,16 @@ select {
 }
 
 .about-app {
+  display: flex;
+  flex-direction: column;
+  background: #0f0f0a;
+}
+
+.about-app-shell {
+  min-height: 0;
+  height: 100%;
   display: grid;
   grid-template-columns: 180px 1fr;
-  background: #0f0f0a;
 }
 
 .about-sidebar {
@@ -1570,7 +1749,6 @@ select {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: 1.15rem 1.35rem 1.2rem;
   background: #0f0f0a;
 }
 
@@ -1602,7 +1780,6 @@ select {
 }
 
 .about-note-body {
-  overflow-y: auto;
   color: #e2e8f0;
   font-size: 15px;
   line-height: 2;
@@ -1661,6 +1838,7 @@ select {
   flex-direction: column;
   gap: 16px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .achievement-card {
@@ -1747,7 +1925,7 @@ select {
   background: rgba(17, 17, 24, 0.86);
   backdrop-filter: blur(20px);
   border-top: 1px solid #2a2a3a;
-  z-index: 4;
+  z-index: 200;
 }
 
 .taskbar-section {
