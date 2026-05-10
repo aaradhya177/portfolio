@@ -7,13 +7,11 @@ function downloadResume() {
   const link = document.createElement('a');
   link.href = RESUME_PATH;
   link.download = RESUME_FILENAME;
-  document.body.appendChild(link);
   link.click();
-  document.body.removeChild(link);
 }
 
 function ResumeAppComponent() {
-  const [loadFailed, setLoadFailed] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   return (
     <div className="resume-app">
@@ -30,31 +28,52 @@ function ResumeAppComponent() {
         </button>
       </div>
 
-      <div
-        className="resume-viewer-shell app-scroll"
-        style={{
-          overflowY: 'auto',
-          height: 'calc(100% - 36px)',
-        }}
-      >
-        {!loadFailed ? (
+      <div className="resume-viewer-shell">
+        {!loadError ? (
           <iframe
             src={RESUME_PATH}
             width="100%"
             height="100%"
             style={{
               border: 'none',
-              borderRadius: '0 0 10px 10px',
+              display: 'block',
+              background: '#ffffff',
             }}
             title="Aaradhya Mehra Resume"
-            onError={() => setLoadFailed(true)}
+            onError={() => setLoadError(true)}
           />
         ) : null}
 
-        {loadFailed ? (
-          <div className="resume-fallback-message">
-            <p>📄 Resume not found.</p>
-            <p>Place Aaradhya_Mehra_Resume.pdf in the public/ folder.</p>
+        {loadError ? (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '100%',
+              gap: '12px',
+            }}
+          >
+            <span style={{ fontSize: '32px' }}>📄</span>
+            <p
+              style={{
+                color: '#64748b',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '13px',
+              }}
+            >
+              Resume PDF not found.
+            </p>
+            <p
+              style={{
+                color: '#374151',
+                fontFamily: 'JetBrains Mono',
+                fontSize: '12px',
+              }}
+            >
+              Place Aaradhya_Mehra_Resume.pdf in the public/ folder.
+            </p>
           </div>
         ) : null}
       </div>

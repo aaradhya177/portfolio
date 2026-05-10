@@ -518,7 +518,7 @@ export function WindowFrame({
           {!isMaximized && (
             <button
               type="button"
-              className="window-frame-resize-handle"
+              className="window-frame-resize-handle resize-handle"
               onMouseDown={handleResizeStart}
               aria-label={`Resize ${title}`}
             />

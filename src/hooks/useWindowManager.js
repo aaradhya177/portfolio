@@ -18,8 +18,8 @@ const WINDOW_DEFINITIONS = [
     id: 'resume',
     title: 'Resume',
     icon: '\u{1F4C4}',
-    defaultWidth: 780,
-    defaultHeight: 620,
+    defaultWidth: 820,
+    defaultHeight: 680,
   },
   {
     id: 'projects',

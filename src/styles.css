@@ -12,7 +12,34 @@
 
 * {
   box-sizing: border-box;
-  cursor: none !important;
+  cursor: default;
+}
+
+button,
+a,
+[role='button'],
+.clickable,
+.icon,
+.traffic-btn,
+.desktop-icon {
+  cursor: pointer;
+}
+
+input,
+textarea {
+  cursor: text;
+}
+
+.drag-handle {
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.resize-handle {
+  cursor: se-resize;
 }
 
 html,
@@ -40,119 +67,6 @@ select {
   width: 100%;
   min-height: 100vh;
   isolation: isolate;
-}
-
-.cursor-system,
-.cursor-dot,
-.cursor-ring,
-.cursor-trail-dot {
-  position: fixed;
-  pointer-events: none;
-}
-
-.cursor-system {
-  inset: 0;
-  z-index: 99999;
-}
-
-.cursor-dot,
-.cursor-ring,
-.cursor-trail-dot {
-  transform: translate(-50%, -50%);
-}
-
-.cursor-dot {
-  width: 8px;
-  height: 8px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #00f5ff;
-  color: #00f5ff;
-  box-shadow:
-    0 0 8px rgba(0, 245, 255, 0.8),
-    0 0 16px rgba(0, 245, 255, 0.4);
-  transition:
-    width 200ms ease,
-    height 200ms ease,
-    opacity 200ms ease,
-    border-radius 200ms ease,
-    transform 200ms ease,
-    background-color 200ms ease,
-    box-shadow 200ms ease;
-}
-
-.cursor-dot.is-hover {
-  width: 4px;
-  height: 4px;
-  opacity: 0.5;
-}
-
-.cursor-dot.is-click {
-  width: 12px;
-  height: 12px;
-}
-
-.cursor-dot.is-text {
-  width: 2px;
-  height: 18px;
-  border-radius: 999px;
-}
-
-.cursor-dot.is-drag {
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 50%;
-  opacity: 0.95;
-}
-
-.cursor-ring {
-  width: 32px;
-  height: 32px;
-  border: 1.5px solid rgba(0, 245, 255, 0.5);
-  border-radius: 50%;
-  background: transparent;
-  z-index: 99998;
-  transition:
-    width 200ms ease,
-    height 200ms ease,
-    opacity 200ms ease,
-    transform 200ms ease,
-    border-color 200ms ease,
-    background-color 200ms ease,
-    border-style 200ms ease;
-}
-
-.cursor-ring.is-hover {
-  width: 48px;
-  height: 48px;
-  border-color: rgba(0, 245, 255, 1);
-  background: rgba(0, 245, 255, 0.05);
-}
-
-.cursor-ring.is-click {
-  width: 24px;
-  height: 24px;
-}
-
-.cursor-ring.is-text {
-  opacity: 0.2;
-}
-
-.cursor-ring.is-drag {
-  border-style: dashed;
-}
-
-.cursor-trail-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #00f5ff;
-  box-shadow: 0 0 8px rgba(0, 245, 255, 0.3);
-  z-index: 99997;
-  transition: opacity 300ms ease;
 }
 
 .bios-screen,
