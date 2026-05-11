@@ -10,6 +10,31 @@ import { useBoot } from './hooks/useBoot';
 import { useScreensaver } from './hooks/useScreensaver';
 import { useWindowManager } from './hooks/useWindowManager';
 
+function MobileApp() {
+  const { stage, biosLines, loadingProgress, loadingMessage, unlock } = useBoot();
+
+  useEffect(() => {
+    if (stage === 'login') {
+      unlock();
+    }
+  }, [stage, unlock]);
+
+  return (
+    <main className="app-shell">
+      {stage === 'bios' && <BiosScreen lines={biosLines} />}
+
+      {(stage === 'loading' || stage === 'login') && (
+        <LoadingBar
+          progress={stage === 'login' ? 100 : loadingProgress}
+          message={stage === 'login' ? 'Optimizing mobile portfolio...' : loadingMessage}
+        />
+      )}
+
+      {stage === 'desktop' && <MobilePortfolio />}
+    </main>
+  );
+}
+
 function DesktopApp() {
   const {
     stage,
@@ -98,7 +123,7 @@ function App() {
   }, []);
 
   if (isMobile) {
-    return <MobilePortfolio />;
+    return <MobileApp />;
   }
 
   return <DesktopApp />;
