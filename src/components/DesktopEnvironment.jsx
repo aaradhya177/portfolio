@@ -1,12 +1,16 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { profile } from '../data/profile';
 import { ContextMenu } from './ContextMenu';
+import { DesktopAvailabilityBanner } from './DesktopAvailabilityBanner';
 import { DesktopIcons } from './DesktopIcons';
 import { MusicPlayer } from './MusicPlayer';
 import { DesktopWallpaper } from './DesktopWallpaper';
+import { ShareButton } from './ShareButton';
 import { Taskbar } from './Taskbar';
 import { WindowLayer } from './WindowLayer';
 
+const BANNER_HEIGHT = 32;
 const TASKBAR_HEIGHT = 48;
 const SECURITY_TRIGGER = 'sudo rm -rf /';
 const CONTEXT_MENU_WIDTH = 220;
@@ -47,6 +51,9 @@ export function DesktopEnvironment({
   const [aboutVisible, setAboutVisible] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState(null);
   const [uptime, setUptime] = useState(0);
+  const [bannerReady, setBannerReady] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const desktopRef = useRef(null);
   const taskbarButtonRegistryRef = useRef(new Map());
   const typedBufferRef = useRef('');
@@ -140,6 +147,30 @@ export function DesktopEnvironment({
   }, []);
 
   useEffect(() => {
+    if (!desktopVisible) {
+      return undefined;
+    }
+
+    const dismissed = window.sessionStorage.getItem('bannerDismissed');
+    if (dismissed) {
+      setBannerDismissed(true);
+      setBannerReady(true);
+      return undefined;
+    }
+
+    setBannerDismissed(false);
+    setBannerReady(true);
+
+    const timerId = window.setTimeout(() => {
+      setBannerVisible(true);
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [desktopVisible]);
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
       setUptime(Date.now() - pageLoadTimeRef.current);
     }, 1000);
@@ -172,6 +203,11 @@ export function DesktopEnvironment({
   const handleDesktopClick = () => {
     setSelectedIconId(null);
     setContextMenuPosition(null);
+  };
+
+  const handleBannerDismiss = () => {
+    window.sessionStorage.setItem('bannerDismissed', 'true');
+    setBannerVisible(false);
   };
 
   const handleDesktopContextMenu = (event) => {
@@ -215,72 +251,112 @@ export function DesktopEnvironment({
 
   if (isMobile) {
     return (
-      <div ref={desktopRef} className="desktop-environment">
-        <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
-        <div className="mobile-fallback">
-          <div className="mobile-fallback-card">
-            <div className="mobile-fallback-monogram">AM</div>
-            <h2 className="mobile-fallback-title">AaradhyaOS is best experienced on desktop.</h2>
-            <div className="mobile-fallback-name">{profile.name}</div>
-            <p className="mobile-fallback-bio">
-              AI/ML and full stack engineer building end-to-end products, research-driven systems,
-              and ambitious developer tools.
-            </p>
-            <div className="mobile-fallback-links">
-              <a href={profile.githubUrl} target="_blank" rel="noreferrer">
-                GitHub
-              </a>
-              <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">
-                LinkedIn
-              </a>
-              <a href={`mailto:${profile.email}`}>Email</a>
+      <div className="desktop-environment">
+        <AnimatePresence
+          onExitComplete={() => {
+            setBannerDismissed(true);
+          }}
+        >
+          {bannerReady && !bannerDismissed && bannerVisible ? (
+            <DesktopAvailabilityBanner email={profile.email} onDismiss={handleBannerDismiss} />
+          ) : null}
+        </AnimatePresence>
+
+        <motion.div
+          ref={desktopRef}
+          className="desktop-content-shell"
+          initial={false}
+          animate={{ top: bannerVisible ? BANNER_HEIGHT : 0 }}
+          transition={{
+            duration: bannerVisible ? 0.4 : 0.3,
+            ease: bannerVisible ? 'easeOut' : 'easeIn',
+          }}
+        >
+          <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
+          <div className="mobile-fallback">
+            <div className="mobile-fallback-card">
+              <div className="mobile-fallback-monogram">AM</div>
+              <h2 className="mobile-fallback-title">AaradhyaOS is best experienced on desktop.</h2>
+              <div className="mobile-fallback-name">{profile.name}</div>
+              <p className="mobile-fallback-bio">
+                AI/ML and full stack engineer building end-to-end products, research-driven systems,
+                and ambitious developer tools.
+              </p>
+              <div className="mobile-fallback-links">
+                <a href={profile.githubUrl} target="_blank" rel="noreferrer">
+                  GitHub
+                </a>
+                <a href={profile.linkedinUrl} target="_blank" rel="noreferrer">
+                  LinkedIn
+                </a>
+                <a href={`mailto:${profile.email}`}>Email</a>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div
-      ref={desktopRef}
-      className={`desktop-environment${securityVisible ? ' is-flickering' : ''}`}
-      onClick={handleDesktopClick}
-      onContextMenu={handleDesktopContextMenu}
-    >
-      <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
+    <div className={`desktop-environment${securityVisible ? ' is-flickering' : ''}`}>
+      <AnimatePresence
+        onExitComplete={() => {
+          setBannerDismissed(true);
+        }}
+      >
+        {bannerReady && !bannerDismissed && bannerVisible ? (
+          <DesktopAvailabilityBanner email={profile.email} onDismiss={handleBannerDismiss} />
+        ) : null}
+      </AnimatePresence>
 
-      <MusicPlayer />
+      <motion.div
+        ref={desktopRef}
+        className="desktop-content-shell"
+        initial={false}
+        animate={{ top: bannerVisible ? BANNER_HEIGHT : 0 }}
+        transition={{
+          duration: bannerVisible ? 0.4 : 0.3,
+          ease: bannerVisible ? 'easeOut' : 'easeIn',
+        }}
+        onClick={handleDesktopClick}
+        onContextMenu={handleDesktopContextMenu}
+      >
+        <DesktopWallpaper wallpaperStyle={wallpaperStyle} />
 
-      <WindowLayer
-        activeWindowId={activeWindowId}
-        closeWindow={closeWindow}
-        desktopBounds={desktopBounds}
-        finalizeWindowTransition={finalizeWindowTransition}
-        focusWindow={focusWindow}
-        getTaskbarButtonRect={getTaskbarButtonRect}
-        minimizeWindow={minimizeWindow}
-        toggleMaximizeWindow={toggleMaximizeWindow}
-        updateWindowRect={updateWindowRect}
-        windows={windows}
-      />
+        <MusicPlayer />
+        <ShareButton />
 
-      <DesktopIcons
-        desktopVisible={desktopVisible}
-        onOpenIcon={openWindow}
-        onSelectIcon={setSelectedIconId}
-        refreshCycle={refreshCycle}
-        selectedIconId={selectedIconId}
-      />
+        <WindowLayer
+          activeWindowId={activeWindowId}
+          closeWindow={closeWindow}
+          desktopBounds={desktopBounds}
+          finalizeWindowTransition={finalizeWindowTransition}
+          focusWindow={focusWindow}
+          getTaskbarButtonRect={getTaskbarButtonRect}
+          minimizeWindow={minimizeWindow}
+          toggleMaximizeWindow={toggleMaximizeWindow}
+          updateWindowRect={updateWindowRect}
+          windows={windows}
+        />
 
-      <Taskbar
-        activeWindowId={activeWindowId}
-        focusWindow={focusWindow}
-        minimizeWindow={minimizeWindow}
-        openWindow={openWindow}
-        openWindows={openWindows}
-        registerTaskbarButton={registerTaskbarButton}
-      />
+        <DesktopIcons
+          desktopVisible={desktopVisible}
+          onOpenIcon={openWindow}
+          onSelectIcon={setSelectedIconId}
+          refreshCycle={refreshCycle}
+          selectedIconId={selectedIconId}
+        />
+
+        <Taskbar
+          activeWindowId={activeWindowId}
+          focusWindow={focusWindow}
+          minimizeWindow={minimizeWindow}
+          openWindow={openWindow}
+          openWindows={openWindows}
+          registerTaskbarButton={registerTaskbarButton}
+        />
+      </motion.div>
 
       {securityVisible ? (
         <div className="security-overlay" role="alert">

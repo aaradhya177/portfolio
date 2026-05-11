@@ -1,14 +1,16 @@
+import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { BiosScreen } from './components/BiosScreen';
 import { DesktopEnvironment } from './components/DesktopEnvironment';
 import { LoadingBar } from './components/LoadingBar';
 import { LoginScreen } from './components/LoginScreen';
+import { MobilePortfolio } from './components/MobilePortfolio';
 import { Screensaver } from './components/Screensaver';
 import { useBoot } from './hooks/useBoot';
 import { useScreensaver } from './hooks/useScreensaver';
 import { useWindowManager } from './hooks/useWindowManager';
 
-function App() {
+function DesktopApp() {
   const {
     stage,
     biosLines,
@@ -83,6 +85,23 @@ function App() {
       )}
     </main>
   );
+}
+
+function App() {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  if (isMobile) {
+    return <MobilePortfolio />;
+  }
+
+  return <DesktopApp />;
 }
 
 export default App;
