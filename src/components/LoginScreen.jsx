@@ -41,6 +41,33 @@ function createParticle(width, height) {
   };
 }
 
+function handleProfileImageError(event, size) {
+  const image = event.currentTarget;
+  image.style.display = 'none';
+
+  const parent = image.parentElement;
+
+  if (!parent || parent.dataset.fallbackApplied === 'true') {
+    return;
+  }
+
+  parent.dataset.fallbackApplied = 'true';
+  parent.style.background = 'linear-gradient(135deg, #00F5FF, #7C3AED)';
+
+  const fallback = document.createElement('span');
+  fallback.textContent = 'AM';
+  fallback.style.position = 'absolute';
+  fallback.style.top = '50%';
+  fallback.style.left = '50%';
+  fallback.style.transform = 'translate(-50%, -50%)';
+  fallback.style.fontFamily = 'Syne, sans-serif';
+  fallback.style.fontSize = size;
+  fallback.style.fontWeight = '700';
+  fallback.style.color = 'white';
+
+  parent.appendChild(fallback);
+}
+
 export function LoginScreen({ isExiting, onLogin }) {
   const canvasRef = useRef(null);
   const [filledDots, setFilledDots] = useState(0);
@@ -186,8 +213,29 @@ export function LoginScreen({ isExiting, onLogin }) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.3 }}
         >
-          <div className="login-avatar login-avatar-redesigned" aria-hidden="true">
-            <span>AM</span>
+          <div
+            style={{
+              width: '88px',
+              height: '88px',
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '2px solid rgba(0,245,255,0.4)',
+              boxShadow: '0 0 24px rgba(0,245,255,0.25), 0 0 48px rgba(0,245,255,0.1)',
+              flexShrink: 0,
+              position: 'relative',
+            }}
+          >
+            <img
+              src="/Aaradhya_linkedin.jpeg"
+              alt="Aaradhya Mehra"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: 'center top',
+              }}
+              onError={(event) => handleProfileImageError(event, '28px')}
+            />
           </div>
 
           <div className="login-greeting">{greeting}</div>
