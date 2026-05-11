@@ -247,12 +247,27 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
   }, []);
 
   useEffect(() => {
-    const root = scrollRootRef.current;
     const sections = Object.entries(sectionRefs.current);
 
-    if (!root || sections.length === 0) {
+    if (sections.length === 0) {
       return undefined;
     }
+
+    const revealFallbackTimeoutId = window.setTimeout(() => {
+      setVisibleSections((currentSections) => {
+        const nextSections = { ...currentSections };
+        let changed = false;
+
+        MOBILE_SECTIONS.forEach((section) => {
+          if (!nextSections[section.id]) {
+            nextSections[section.id] = true;
+            changed = true;
+          }
+        });
+
+        return changed ? nextSections : currentSections;
+      });
+    }, 1200);
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -289,9 +304,9 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
         }
       },
       {
-        root,
-        threshold: [0.2, 0.4, 0.6, 0.8],
-        rootMargin: '-10% 0px -10% 0px',
+        root: null,
+        threshold: [0.15, 0.35, 0.55, 0.75],
+        rootMargin: '-8% 0px -8% 0px',
       },
     );
 
@@ -300,6 +315,7 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
     });
 
     return () => {
+      window.clearTimeout(revealFallbackTimeoutId);
       observer.disconnect();
     };
   }, []);
