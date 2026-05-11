@@ -1,5 +1,6 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { achievements } from '../data/achievements';
+import { MobileMusicPlayer } from './MobileMusicPlayer';
 import { projects } from '../data/projects';
 import { profile } from '../data/profile';
 import { skillCategories } from '../data/skills';
@@ -129,6 +130,33 @@ function CodeforcesIcon() {
 
 function openLink(href) {
   window.open(href, '_blank', 'noopener,noreferrer');
+}
+
+function handleProfileImageError(event) {
+  const image = event.currentTarget;
+  image.style.display = 'none';
+
+  const parent = image.parentElement;
+
+  if (!parent || parent.dataset.fallbackApplied === 'true') {
+    return;
+  }
+
+  parent.dataset.fallbackApplied = 'true';
+  parent.style.background = 'linear-gradient(135deg, #00F5FF, #7C3AED)';
+
+  const fallback = document.createElement('span');
+  fallback.textContent = 'AM';
+  fallback.style.position = 'absolute';
+  fallback.style.top = '50%';
+  fallback.style.left = '50%';
+  fallback.style.transform = 'translate(-50%, -50%)';
+  fallback.style.fontFamily = 'Syne, sans-serif';
+  fallback.style.fontSize = '28px';
+  fallback.style.fontWeight = '700';
+  fallback.style.color = 'white';
+
+  parent.appendChild(fallback);
 }
 
 export const MobilePortfolio = memo(function MobilePortfolio() {
@@ -310,6 +338,8 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
         ))}
       </nav>
 
+      <MobileMusicPlayer />
+
       <section
         ref={setSectionRef('hero')}
         data-section-id="hero"
@@ -321,7 +351,20 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
 
         <div className="mobile-portfolio-hero-content">
           <div className="mobile-portfolio-avatar-shell">
-            <div className="mobile-portfolio-avatar">AM</div>
+            <div className="mobile-portfolio-avatar">
+              <img
+                className="mobile-portfolio-avatar-image"
+                src="/Aaradhya_linkedin.jpeg"
+                alt="Aaradhya Mehra"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: '58% 18%',
+                }}
+                onError={handleProfileImageError}
+              />
+            </div>
           </div>
 
           <h1 className="mobile-portfolio-name">{profile.name}</h1>

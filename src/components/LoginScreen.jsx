@@ -232,7 +232,7 @@ export function LoginScreen({ isExiting, onLogin }) {
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
-                objectPosition: 'center top',
+                objectPosition: '58% 18%',
               }}
               onError={(event) => handleProfileImageError(event, '28px')}
             />
