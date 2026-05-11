@@ -389,7 +389,7 @@ export const MobilePortfolio = memo(function MobilePortfolio() {
 
           <div className="mobile-portfolio-availability">
             <span className="mobile-portfolio-availability-dot" aria-hidden="true" />
-            <span>Open to Internships {'\u2022'} July 2025</span>
+            <span>Open to Internships</span>
           </div>
 
           <div className="mobile-portfolio-meta">BIT Bengaluru {'\u2022'} CGPA 8.5 {'\u2022'} Graduating June 2027</div>
