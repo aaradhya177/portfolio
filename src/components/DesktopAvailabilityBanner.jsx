@@ -21,10 +21,6 @@ export function DesktopAvailabilityBanner({ email, onDismiss }) {
           {'\u00b7'}
         </span>
         <span className="desktop-availability-banner-secondary">Bengaluru {'\u00b7'} Remote</span>
-        <span className="desktop-availability-banner-separator" aria-hidden="true">
-          {'\u00b7'}
-        </span>
-        <span className="desktop-availability-banner-secondary">Available July 2025</span>
       </div>
 
       <div className="desktop-availability-banner-section desktop-availability-banner-right">
